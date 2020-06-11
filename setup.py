@@ -7,9 +7,6 @@ setup(
     author_email="pengzh@ie.cuhk.edu.hk",
     packages=['visya'],
     install_requires=[
-        "yapf==0.27",
-        "gym==0.17.2",
-        "gym[box2d]",
-        "opencv-python"
+        "yapf==0.27", "gym==0.17.2", "gym[box2d]", "opencv-python", "pillow"
     ]
 )
