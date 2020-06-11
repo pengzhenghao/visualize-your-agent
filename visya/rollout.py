@@ -16,12 +16,24 @@ logger = logging.getLogger(__name__)
 LOG_INTERVAL_STEPS = 1000
 
 
-def rollout(compute_action, env, num_steps=1000, close_env=False):
+def get_best_rollout(compute_action, env, num_episodes=3, num_steps=1000,
+                     close_env=False):
+    print("We will return the best one in {} episodes.".format(num_episodes))
+    result_list = []
+    for ep in range(num_episodes):
+        result = rollout(compute_action, env, num_steps, 100 * ep, close_env)
+        result_list.append(result)
+    return max(result_list, key=lambda i: i.episode_reward)
+
+
+def rollout(compute_action, env, num_steps=1000, seed=0, close_env=False):
     # Check environment
     if isinstance(env, str):
         logging.info("Use default gym environment for you.")
         env = gym.make(env)
     assert isinstance(env, gym.Env)
+
+    env.seed(seed)
 
     # Setup variable
     steps = 0
