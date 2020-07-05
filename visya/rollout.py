@@ -17,16 +17,22 @@ LOG_INTERVAL_STEPS = 1000
 
 
 def get_best_rollout(compute_action, env, num_episodes=3, num_steps=1000,
-                     close_env=False):
+                     return_all=False, close_env=False, render_kwargs=None,
+                     seed_start=0):
     print("We will return the best one in {} episodes.".format(num_episodes))
     result_list = []
     for ep in range(num_episodes):
-        result = rollout(compute_action, env, num_steps, 100 * ep, close_env)
+        result = rollout(compute_action, env, num_steps, 100 * ep + seed_start,
+                         close_env, render_kwargs)
         result_list.append(result)
+        print("Finished {}/{} episodes.".format(ep + 1, num_episodes))
+    if return_all:
+        return result_list
     return max(result_list, key=lambda i: i.episode_reward)
 
 
-def rollout(compute_action, env, num_steps=1000, seed=0, close_env=False):
+def rollout(compute_action, env, num_steps=1000, seed=0, close_env=False,
+            render_kwargs=None):
     # Check environment
     if isinstance(env, str):
         logging.info("Use default gym environment for you.")
@@ -58,6 +64,8 @@ def rollout(compute_action, env, num_steps=1000, seed=0, close_env=False):
         action = compute_action(obs)
         next_obs, reward, done, _ = env.step(action)
         kwargs = {"mode": "rgb_array"}
+        if render_kwargs is not None:
+            kwargs.update(render_kwargs)
         frame = env.render(**kwargs).copy()
         frames.append(frame)
         ep_reward += reward
